@@ -3,7 +3,7 @@ import { updateStats } from './stats.js';
 import { ITEM_DATABASE } from '../content/items.js';  
 import { showScene } from './renderer.js';  
 import { checkThresholds } from './stats.js';
-import { SCENES } from '../../scenes/_index.js';
+import { SCENES } from '../../scenes/index.js';
 import { giveItem } from './inventory.js';
 import { showToast } from './ui.js';
 
