@@ -7,7 +7,7 @@ import { showScene } from '../js/engine/renderer.js';
 
 export const SCENES = {
 	opening: {
-		text: `The light hurts.
+		text: `The light hurts your eyes.
 
 It arrives too bright, too sudden—piercing the thin membrane of whatever half-sleep you'd managed to claw together. You blink awake into the assault of noon sun glaring through curtains you don't remember opening, or perhaps he opened them before he left, part of some silent choreography you were too unconscious to witness.
 
