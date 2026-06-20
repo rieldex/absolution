@@ -1,5 +1,166 @@
 <!DOCTYPE html>
-<html>
-  <head><title>test</title></head>
-  <body><h1>hihihihi</h1></body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Universe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #e94560;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 3rem;
+        }
+
+        /* Button Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* Game Card/Button */
+        .game-card {
+            background: #16213e;
+            border: 2px solid #0f3460;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: #eee;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .game-card:hover {
+            border-color: #e94560;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .game-desc {
+            font-size: 0.9rem;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        .play-btn {
+            background: #e94560;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        /* Character quick links (optional) */
+        .char-bar {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #0f3460;
+            text-align: center;
+        }
+
+        .char-btn {
+            display: inline-block;
+            margin: 0.3rem;
+            padding: 0.5rem 1rem;
+            background: #0f3460;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎭 Character Universe</h1>
+    <p class="subtitle">Interactive timelines, dossiers, and simulations</p>
+
+    <div class="game-grid">
+        <!-- Timeline Explorer -->
+        <a href="timeline-explorer/" class="game-card">
+            <div class="game-icon">📅</div>
+            <div class="game-title">Timeline Explorer</div>
+            <div class="game-desc">
+                wip
+            </div>
+            <span class="play-btn">Explore →</span>
+        </a>
+
+        <!-- Future: Phone Simulator -->
+        <a href="phone-simulator/" class="game-card">
+            <div class="game-icon">📱</div>
+            <div class="game-title">Phone Simulator</div>
+            <div class="game-desc">
+                tba
+            </div>
+            <span class="play-btn">Play →</span>
+        </a>
+
+        <!-- Future: Contract Manager -->
+        <a href="contract-game/" class="game-card">
+            <div class="game-icon">📋</div>
+            <div class="game-title">Contract Manager</div>
+            <div class="game-desc">
+                tba
+            </div>
+            <span class="play-btn">Manage →</span>
+        </a>
+
+        <!-- Future: Relationship Web -->
+        <a href="relationship-web/" class="game-card">
+            <div class="game-icon">🕸️</div>
+            <div class="game-title">Relationship Web</div>
+            <div class="game-desc">
+                tba
+            </div>
+            <span class="play-btn">View →</span>
+        </a>
+    </div>
+
+    <div class="char-bar">
+        <span class="char-btn">🐇 Dottie</span>
+        <span class="char-btn">🦅 Mikhail</span>
+        <span class="char-btn">🦊 Rémy</span>
+        <span class="char-btn">🐕 Ingram</span>
+    </div>
+</body>
 </html>
