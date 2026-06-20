@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Timeline Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: #16213e;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #0f3460;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            color: #e94560;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Character Toggle Bar */
+        .char-bar {
+            background: #0f3460;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .char-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid #e94560;
+            background: transparent;
+            color: #eee;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .char-btn:hover, .char-btn.active {
+            background: #e94560;
+        }
+
+        /* Bio Panels - Horizontal scroll */
+        .bio-wrapper {
+            background: #16213e;
+            padding: 1rem;
+            overflow-x: auto;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        .bio-wrapper.show {
+            display: block;
+        }
+
+        .bio-container {
+            display: flex;
+            gap: 1rem;
+            width: max-content;
+        }
+
+        .bio-panel {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 350px;
+            flex-shrink: 0;
+            border-left: 4px solid;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .bio-panel.dottie { border-color: #ff6b9d; }
+        .bio-panel.mikhail { border-color: #4ecdc4; }
+        .bio-panel.remy { border-color: #f7b731; }
+        .bio-panel.ingram { border-color: #a55eea; }
+
+        .bio-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .bio-section {
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .bio-section strong {
+            color: #e94560;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Horizontal Timeline Container */
+        .timeline-wrapper {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            background: #1a1a2e;
+            position: relative;
+        }
+
+        .timeline-track {
+            display: flex;
+            align-items: flex-start;
+            padding: 2rem;
+            min-width: max-content;
+            gap: 2rem;
+        }
+
+        /* Year Block */
+        .year-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .year-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #e94560;
+            background: #16213e;
+            color: #eee;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .year-btn:hover {
+            background: #e94560;
+            transform: scale(1.1);
+        }
+
+        .year-btn.active {
+            background: #e94560;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+
+        /* Connecting line */
+        .year-block::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 80px;
+            width: 2rem;
+            height: 3px;
+            background: #0f3460;
+        }
+
+        .year-block:last-child::after {
+            display: none;
+        }
+
+        /* Scene Popup/Drawer */
+        .scene-drawer {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            background: #16213e;
+            border: 2px solid #e94560;
+            border-radius: 12px;
+            padding: 1rem;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .scene-drawer.show {
+            display: block;
+        }
+
+        .scene-drawer::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #e94560;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .drawer-title {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .close-drawer {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .close-drawer:hover {
+            color: #e94560;
+        }
+
+        .scene-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .scene-item {
+            background: #0f3460;
+            padding: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .scene-item:hover {
+            background: #1a4d6e;
+            border-left-color: #e94560;
+        }
+
+        .scene-item-date {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 0.2rem;
+        }
+
+        .scene-item-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .scene-item-chars {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Detail Panel - Fixed on right */
+        .detail-panel {
+            position: fixed;
+            right: -500px;
+            top: 0;
+            width: 450px;
+            height: 100vh;
+            background: #16213e;
+            border-left: 3px solid #e94560;
+            padding: 2rem;
+            overflow-y: auto;
+            transition: right 0.3s;
+            z-index: 1000;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+        }
+
+        .detail-panel.show {
+            right: 0;
+        }
+
+        .detail-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .detail-close:hover {
+            color: #e94560;
+        }
+
+        .detail-content h2 {
+            color: #e94560;
+            margin-bottom: 0.5rem;
+            padding-right: 2rem;
+        }
+
+        .detail-meta {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-desc {
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .pov-section {
+            background: #0f3460;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .pov-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .pov-tab {
+            padding: 0.4rem 0.8rem;
+            background: #16213e;
+            border: 1px solid #e94560;
+            color: #eee;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .pov-tab.active, .pov-tab:hover {
+            background: #e94560;
+        }
+
+        .pov-content {
+            display: none;
+        }
+
+        .pov-content.active {
+            display: block;
+        }
+
+        .pov-label {
+            color: #e94560;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #16213e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e94560;
+            border-radius: 4px;
+        }
+
+        .instruction {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎭 Character Timeline Explorer</h1>
+        <div class="subtitle">Click years to view scenes • Click scenes for details</div>
+    </header>
+
+    <div class="char-bar">
+        <button class="char-btn" onclick="toggleBio('dottie')">🐇 Dottie</button>
+        <button class="char-btn" onclick="toggleBio('mikhail')">🦅 Mikhail</button>
+        <button class="char-btn" onclick="toggleBio('remy')">🦊 Rémy</button>
+        <button class="char-btn" onclick="toggleBio('ingram')">🐕 Ingram</button>
+    </div>
+
+    <div class="bio-wrapper" id="bioWrapper">
+        <div class="bio-container" id="bioContainer"></div>
+    </div>
+
+    <div class="timeline-wrapper" id="timelineWrapper">
+        <div class="timeline-track" id="timelineTrack">
+            <div class="instruction">Loading timeline...</div>
+        </div>
+    </div>
+
+    <!-- Detail Side Panel -->
+    <div class="detail-panel" id="detailPanel">
+        <button class="detail-close" onclick="closeDetail()">×</button>
+        <div class="detail-content" id="detailContent"></div>
+    </div>
+
+    <script>
+        const characters = {
+            dottie: { name: "Dottie", icon: "🐇", color: "#ff6b9d" },
+            mikhail: { name: "Mikhail", icon: "🦅", color: "#4ecdc4" },
+            remy: { name: "Rémy", icon: "🦊", color: "#f7b731" },
+            ingram: { name: "Ingram", icon: "🐕", color: "#a55eea" }
+        };
+
+        const bios = {
+            dottie: {
+                name: "Dorothy \"Dottie\" Sissyk",
+                icon: "🐇",
+                color: "#ff6b9d",
+                sections: [
+                    { title: "Basic Info", content: "23 • Agender/nonbinary (AFAB) • They/them • Androsexual • Chicago, IL" },
+                    { title: "Appearance", content: "Pale olive skin, dark amber eyes, chestnut hair with braids, 5'4\", red circle glasses. Girly kei/coquette style." },
+                    { title: "Diagnoses", content: "Anxiety, Depression, Autism (Level 1), ADHD, Borderline Personality Disorder" },
+                    { title: "Personality", content: "Clingy, bratty, compulsive liar. Lowercase typer, run-on sentences, emoticons." },
+                    { title: "Key Relationships", content: "Mikhail (boyfriend, CG/l), Rémy (friend), Ingram (close friend)" }
+                ]
+            },
+            mikhail: {
+                name: "Mikhail Anatoly Solntsev",
+                icon: "🦅",
+                color: "#4ecdc4",
+                sections: [
+                    { title: "Basic Info", content: "42 • Cis male • He/him • Demiromantic, pansexual • Oslo → US at 8" },
+                    { title: "Appearance", content: "Fair skin, dark hair, grey eyes, 5'9\", muscular. Tech bro aesthetic. Greying temples." },
+                    { title: "Diagnoses", content: "Autism, PTSD, Obsessive-Compulsive Personality Disorder" },
+                    { title: "Personality", content: "Cold, formal, strict routines. Formal typer, full punctuation." },
+                    { title: "Key Relationships", content: "Dottie (partner, DD/lg), Rémy (best friend), Sarah (ex-wife)" }
+                ]
+            },
+            remy: {
+                name: "Rémy Ephraim Lavergne",
+                icon: "🦊",
+                color: "#f7b731",
+                sections: [
+                    { title: "Basic Info", content: "31 • Cis male • He/him • Bisexual (male pref) • Montreal → Chicago at 12" },
+                    { title: "Appearance", content: "Medium olive skin, dark hazel eyes, curly dark hair, 5'10\", lean." },
+                    { title: "Diagnoses", content: "Anxiety, ADHD, malignant narcissism (ASPD/NPD traits)" },
+                    { title: "Personality", content: "Charismatic, controlling, makes jokes of everything. Lowercase, emojis." },
+                    { title: "Key Relationships", content: "Ingram (boyfriend/'pet'), Mikhail (best friend)" }
+                ]
+            },
+            ingram: {
+                name: "Ingram Sigfrid Svalander",
+                icon: "🐕",
+                color: "#a55eea",
+                sections: [
+                    { title: "Basic Info", content: "27 • Male; not quite cis • He/him • Gay • Stockholm → US for college" },
+                    { title: "Appearance", content: "Fair skin, sandy blonde, light green eyes, 6'0\" (hunches), scoliosis." },
+                    { title: "Diagnoses", content: "Autism, ADHD, NPD, Schizoaffective (depressive type)" },
+                    { title: "Personality", content: "High-strung, nervous, neurotic. Lowercase, proper punctuation." },
+                    { title: "Key Relationships", content: "Rémy (boyfriend/'master'), Dottie (close friend)" }
+                ]
+            }
+        };
+
+        const timelineData = [
+            { year: 1984, scenes: [{ date: "Nov 1984", title: "Mikhail Born", chars: ["mikhail"], desc: "Born in Oslo, Norway." }] },
+            { year: 1992, scenes: [{ date: "1992", title: "Mikhail Moves to US", chars: ["mikhail"], desc: "Age 8. Relocated from Norway." }] },
+            { year: 1995, scenes: [{ date: "Jan 1995", title: "Rémy Born", chars: ["remy"], desc: "Born in Montreal." }] },
+            { year: 1999, scenes: [{ date: "Aug 1999", title: "Ingram Born", chars: ["ingram"], desc: "Born in Stockholm." }] },
+            { year: 2002, scenes: [{ date: "2002", title: "Mikhail Enlists", chars: ["mikhail"], desc: "Age 18. Military with HPSP scholarship." }] },
+            { year: 2003, scenes: [{ date: "Mar 2003", title: "Dottie Born", chars: ["dottie"], desc: "Born in Chicago." }] },
+            { year: 2011, scenes: [{ date: "Mar 2011", title: "Rémy's Father Arrested", chars: ["remy"], desc: "Age 16. Hospitalized after beating. DCFS report.", pov: { remy: "I told her to leave for years. She never did.", default: "Yasmina found affair. Jacques-Marie beat Rémy severely. Arrested next day." } }] },
+            { year: 2013, scenes: [{ date: "2013", title: "Ingram Grooming Begins", chars: ["ingram"], desc: "Age 14. Henrik Östberg begins grooming.", pov: { ingram: "He said I was special. I believed him.", default: "Henrik (39) targeted Ingram. Provided drugs and assault." } }] },
+            { year: 2015, scenes: [
+                { date: "2015", title: "Rémy Meets Mikhail", chars: ["remy", "mikhail"], desc: "Rémy (20) meets Mikhail (31) at FHCC.", pov: { remy: "He was so stiff. So easy to bother.", mikhail: "Annoying undergrad wouldn't stop messaging.", default: "Bonded over abusive fathers." } },
+                { date: "2015", title: "Henrik Arrested", chars: ["ingram"], desc: "Police check at rave. Ingram (16) discovered with Henrik.", pov: { ingram: "They looked at me like I was evidence.", default: "Henrik sentenced to 12 years." } }
+            ]},
+            { year: 2016, scenes: [{ date: "2016", title: "Mikhail Meets Dottie", chars: ["mikhail", "dottie"], desc: "Age 32. Met Dottie (13) through Andrzej.", pov: { dottie: "He was so tall and serious. I made it my mission to make him smile.", mikhail: "Andrzej handed me responsibilities. I didn't mind.", default: "Dottie developed crush; Mikhail saw them as ward." } }] },
+            { year: 2019, scenes: [{ date: "2019", title: "The Almost Kiss", chars: ["dottie", "mikhail"], desc: "Dottie (16) attempts to kiss Mikhail (35). He pulls away.", pov: { dottie: "He looked at me like I'd burned him.", mikhail: "I wanted to. That's when I knew I had to pull back.", default: "Mikhail recognized line crossed. COVID provided withdrawal excuse." } }] },
+            { year: 2020, scenes: [
+                { date: "2020", title: "COVID Withdrawal", chars: ["dottie", "mikhail"], desc: "Mikhail fully withdraws, citing pandemic." },
+                { date: "2020", title: "Rémy Meets Ingram", chars: ["remy", "ingram"], desc: "Rémy (25) meets Ingram (21) during rotations.", pov: { remy: "So fragile. So pretty when he cried.", ingram: "He was the only one who treated me like a person.", default: "Rémy played attentive boyfriend. Ingram enamoured." } }
+            ]},
+            { year: 2021, scenes: [
+                { date: "2021", title: "The Assault", chars: ["remy", "ingram"], desc: "Rémy rapes Ingram via coercion, begins gaslighting.", pov: { remy: "He said no, but he didn't mean it.", ingram: "I said no. Then he made me believe I'd said yes.", default: "Two-week captivity period." } },
+                { date: "2021", title: "The Threesome", chars: ["mikhail", "remy", "ingram"], desc: "Mikhail has sex with Ingram while Rémy watches.", pov: { mikhail: "I betrayed her. Not because it was wrong, but because it was her.", remy: "He looked guilty immediately. Delicious.", ingram: "I was so high. I don't remember most of it.", default: "Consent dubious. Mikhail regrets as betrayal of Dottie." } }
+            ]},
+            { year: 2022, scenes: [{ date: "2022", title: "Dottie Kicked Out", chars: ["dottie", "mikhail"], desc: "Dottie (19) kicked out, calls Mikhail (38).", pov: { dottie: "I had nowhere. He said 'come here'.", mikhail: "I should have said no. I said yes because I wanted to.", default: "Relationship began within the year." } }] },
+            { year: 2023, scenes: [{ date: "2023", title: "The Contract", chars: ["dottie", "mikhail"], desc: "Formal CG/l dynamic signed.", pov: { dottie: "He had it printed. Highlighted sections.", mikhail: "Boundaries in writing. Reviewed quarterly.", default: "24/7 dynamic formalized." } }] },
+            { year: 2026, scenes: [{ date: "2026", title: "Present Day", chars: ["dottie", "mikhail", "remy", "ingram"], desc: "Current day. Dottie in college. Mikhail consulting. Rémy/Ingram still in dynamic.", pov: { dottie: "I'm happy. He's happy. Rémy's an asshole but funny.", default: "All four in Chicago." } }] }
+        ];
+
+        let activeYear = null;
+        let activeDrawer = null;
+
+        function toggleBio(char) {
+            const wrapper = document.getElementById('bioWrapper');
+            const container = document.getElementById('bioContainer');
+            const btn = document.querySelector(`button[onclick="toggleBio('${char}')"]`);
+            
+            btn.classList.toggle('active');
+            
+            // Check if any buttons are active
+            const activeBtns = document.querySelectorAll('.char-btn.active');
+            if (activeBtns.length === 0) {
+                wrapper.classList.remove('show');
+                return;
+            }
+            
+            wrapper.classList.add('show');
+            
+            // Rebuild bio panels based on active buttons
+            container.innerHTML = '';
+            activeBtns.forEach(btn => {
+                const charKey = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
+                const bio = bios[charKey];
+                
+                const panel = document.createElement('div');
+                panel.className = `bio-panel ${charKey}`;
+                panel.innerHTML = `
+                    <div class="bio-header"><span style="font-size: 1.3rem;">${bio.icon}</span> ${bio.name}</div>
+                    ${bio.sections.map(s => `
+                        <div class="bio-section">
+                            <strong>${s.title}</strong>
+                            ${s.content}
+                        </div>
+                    `).join('')}
+                `;
+                container.appendChild(panel);
+            });
+        }
+
+        function renderTimeline() {
+            const track = document.getElementById('timelineTrack');
+            track.innerHTML = '';
+            
+            timelineData.forEach((yearData, index) => {
+                const block = document.createElement('div');
+                block.className = 'year-block';
+                block.innerHTML = `
+                    <button class="year-btn" onclick="toggleYear(${yearData.year}, this)">${yearData.year}</button>
+                    <div class="scene-drawer" id="drawer-${yearData.year}">
+                        <div class="drawer-header">
+                            <span class="drawer-title">${yearData.year}</span>
+                            <button class="close-drawer" onclick="closeDrawer(event, ${yearData.year})">×</button>
+                        </div>
+                        <div class="scene-list">
+                            ${yearData.scenes.map((scene, i) => `
+                                <div class="scene-item" onclick="showDetail(${yearData.year}, ${i})">
+                                    <div class="scene-item-date">${scene.date}</div>
+                                    <div class="scene-item-title">${scene.title}</div>
+                                    <div class="scene-item-chars">${scene.chars.map(c => characters[c].icon).join(' ')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                track.appendChild(block);
+            });
+        }
+
+        function toggleYear(year, btn) {
+            // Close other drawers
+            document.querySelectorAll('.scene-drawer').forEach(d => d.classList.remove('show'));
+            document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+            
+            const drawer = document.getElementById(`drawer-${year}`);
+            
+            if (activeYear === year) {
+                activeYear = null;
+                return;
+            }
+            
+            drawer.classList.add('show');
+            btn.classList.add('active');
+            activeYear = year;
+            
+            // Scroll the drawer into view if needed
+            const wrapper = document.getElementById('timelineWrapper');
+            const btnRect = btn.getBoundingClientRect();
+            const wrapRect = wrapper.getBoundingClientRect();
+            
+            if (btnRect.left < wrapRect.left || btnRect.right > wrapRect.right) {
+                btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            }
+        }
+
+        function closeDrawer(e, year) {
+            e.stopPropagation();
+            document.getElementById(`drawer-${year}`).classList.remove('show');
+            document.querySelector(`button[onclick="toggleYear(${year}, this)"]`).classList.remove('active');
+            activeYear = null;
+        }
+
+        function showDetail(year, sceneIndex) {
+            const scene = timelineData.find(y => y.year === year).scenes[sceneIndex];
+            const panel = document.getElementById('detailPanel');
+            const content = document.getElementById('detailContent');
+            
+            let povHtml = '';
+            if (scene.pov) {
+                const chars = Object.keys(scene.pov).filter(k => k !== 'default');
+                povHtml = `
+                    <div class="pov-section">
+                        <div class="pov-tabs">
+                            <button class="pov-tab active" onclick="switchPov('default', this)">Neutral</button>
+                            ${chars.map(c => `<button class="pov-tab" onclick="switchPov('${c}', this)" style="color: ${characters[c]?.color || '#eee'}">${characters[c]?.icon || ''} ${characters[c]?.name || c}</button>`).join('')}
+                        </div>
+                        <div id="pov-default" class="pov-content active">
+                            <div class="pov-label">Neutral Perspective</div>
+                            <div>${scene.pov.default || scene.desc}</div>
+                        </div>
+                        ${chars.map(c => `
+                            <div id="pov-${c}" class="pov-content">
+                                <div class="pov-label" style="color: ${characters[c].color}">${characters[c].icon} ${characters[c].name}'s Perspective</div>
+                                <div>${scene.pov[c]}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = `
+                <h2>${scene.title}</h2>
+                <div class="detail-meta">${scene.date} • ${scene.chars.map(c => characters[c].icon + ' ' + characters[c].name).join(', ')}</div>
+                <div class="detail-desc">${scene.desc}</div>
+                ${povHtml}
+            `;
+            
+            panel.classList.add('show');
+        }
+
+        function switchPov(char, btn) {
+            document.querySelectorAll('.pov-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.pov-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`pov-${char}`).classList.add('active');
+        }
+
+        function closeDetail() {
+            document.getElementById('detailPanel').classList.remove('show');
+        }
+
+        // Close detail panel when clicking outside
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('detailPanel');
+            if (!panel.contains(e.target) && !e.target.closest('.scene-item')) {
+                panel.classList.remove('show');
+            }
+        });
+
+        // Initialize
+        renderTimeline();
+    </script>
+</body>
+</html>
