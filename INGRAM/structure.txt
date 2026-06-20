@@ -1,0 +1,43 @@
+Folder PATH listing for volume Windows-SSD
+Volume serial number is 00000001 54ED:2B10
+C:.
+|   index.html
+|   README.md
+|   STORY.html
+|   structure.txt
+|   
++---assets
+|   +---fonts
+|   \---images
++---css
+|   |   main.css
+|   |   
+|   \---components
++---data
++---js
+|   |   main.js
+|   |   
+|   +---content
+|   |       characters.js
+|   |       items.js
+|   |       
+|   +---engine
+|   |       debug.js
+|   |       inventory.js
+|   |       profiles.js
+|   |       renderer.js
+|   |       renderUtils.js
+|   |       state.js
+|   |       stats.js
+|   |       ui.js
+|   |       
+|   \---utils
++---scenes
+|   |   _index.js
+|   |   
+|   +---chapter1
+|   \---chapter2
+\---templates
+    +---components
+    +---items
+    \---scenes

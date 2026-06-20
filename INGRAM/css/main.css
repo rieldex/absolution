@@ -1,0 +1,1013 @@
+/* ============================================
+   1. RESET & BASE STYLES
+   ============================================ */
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+
+    title {
+      font-family: "Lora", serif;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: "Lora", serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+/* ============================================
+   TITLE SCREEN
+   ============================================ */
+#title-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  font-family: "Lora", serif;
+}
+
+.title-content {
+  text-align: left;
+  max-width: 600px;
+  padding: 40px;
+}
+
+.game-title {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #fff;
+  margin-bottom: 5px;
+  font-family: "JetBrains Mono", monospace;
+  text-shadow: 0 0 40px rgba(255,255,255,0.1);
+}
+
+.title-description {
+  font-size: 16px;
+  color: #7a7a7a;
+  margin-bottom: 5px;
+  font-style: italic;
+}
+
+.title-divider {
+  width: 60px;
+  height: 1px;
+  background: #333;
+  margin: 20px auto;
+}
+
+
+.title-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.title-btn {
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 15px 60px;
+  font-size: 16px;
+  font-family: "JetBrains Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 220px;
+}
+
+.title-btn:hover {
+  border-color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+
+.title-btn.primary {
+  border-color: #555;
+  background: rgba(255,255,255,0.02);
+}
+
+.title-btn.primary:hover {
+  border-color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+/* Content Warning Box */
+.tw-box {
+  border: 1px solid #2a1a1a;
+  background: #0a0a0a;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.tw-header {
+  color: #c22b2b;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tw-header i {
+  font-size: 14px;
+}
+
+.tw-content {
+  color: #666;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.title-footer {
+  margin-top: 60px;
+}
+
+.text-btn {
+  background: transparent;
+  border: none;
+  color: #333;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.2s;
+  font-family: "Lora", serif;
+}
+
+.text-btn:hover {
+  color: #c22b2b;
+}
+
+/* Hide story initially */
+
+#stats {
+  display: none;
+}
+
+/* ============================================
+   2. LAYOUT & STRUCTURE
+   ============================================ */
+
+#story { 
+  flex: 1; 
+  padding: 40px 20px; 
+  max-width: 700px; 
+  margin: 0 auto; 
+  width: 100%; 
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out, filter 0.5s ease;
+  filter: blur(0);
+}
+
+#story.hidden {
+  display: none;
+}
+
+#story-text { 
+  margin-bottom: 30px; 
+}
+
+#story.fade-out {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+.story-narrative {
+  white-space: normal;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  margin-bottom:10px;
+}
+
+.story-narrative:last-child {
+  margin-bottom: 0;
+}
+
+.story-narrative.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.story-narrative:nth-child(1) { transition-delay: 0.1s; }
+.story-narrative:nth-child(2) { transition-delay: 0.2s; }
+.story-narrative:nth-child(3) { transition-delay: 0.3s; }
+.story-narrative:nth-child(4) { transition-delay: 0.4s; }
+.story-narrative:nth-child(5) { transition-delay: 0.5s; }
+
+#circle {
+  width: 32px;
+  height: 32px;
+  background-color: #fff; /* Change color to your preference */
+  border-radius: 50%; /* This is the property that rounds the corners */
+}
+
+#circle2 {
+  width: 16px;
+  height: 16px;
+  background-color: #fff; /* Change color to your preference */
+  border-radius: 50%; /* This is the property that rounds the corners */
+}
+
+
+/* ============================================
+   3. STATS BAR
+   ============================================ */
+#stats {
+  border-bottom: 1px solid #1a1a1a;
+  background: #050505;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  display: none;
+}
+
+#stats-bars { 
+  display: flex; 
+  gap: 28px; 
+}
+
+.stat-row { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+  min-width: 130px; 
+}
+
+.stat-meta-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+
+.stat-label { 
+  font-weight: 700; 
+  color: #666; 
+  text-transform: uppercase; 
+}
+
+.stat-numbers { 
+  color: #999; 
+  font-variant-numeric: tabular-nums; 
+}
+
+.stat-track-rail {
+  height: 3px;
+  background: #141414;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.stat-fill-fluid { 
+  height: 100%; 
+  width: 0%; 
+  transition: width 0.4s ease-out; 
+}
+
+/* Dynamic stat colors */
+#fill-sanity.low { background: #c22b2b !important; }
+#fill-sanity.mid { background: #d4a574 !important; }
+#fill-sanity.high { background:#b0bec5 !important; }
+
+#fill-awareness.low { background: #e0e0e0 !important; }
+#fill-awareness.mid { background: #9fa8da !important; }
+#fill-awareness.high { background:#f4d03f !important; }
+
+#fill-energy.low { background: #1d2030 !important; }
+#fill-energy.mid { background: #6c6f82  !important; }
+#fill-energy.high { background:#e0e0e0 !important; }
+
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: #0a0a0a;
+  border: 1px solid #333;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #ccc;
+  font-family: "Lora", serif;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Unhinged - violent shake + red glow */
+[data-tooltip="unhinged from reality"]::after {
+  animation: text-tremble 0.2s infinite ease-in-out;
+  color: #ff5555;
+  font-weight: bold;
+  text-shadow: 
+    0 0 8px #ff0000,
+    0 0 16px #ff0000,
+    0 0 24px rgba(255, 0, 0, 0.8);
+}
+
+/* Deranged - moderate shake */
+[data-tooltip="deranged"]::after {
+  animation: dynamic-shake 0.4s infinite ease-in-out;
+  color: #ffaa00;
+}
+
+/* Despondent - subtle shake */
+[data-tooltip="despondent"]::after {
+  animation: text-tremble 0.6s infinite ease-in-out;
+  color: #d4a574;
+}
+
+/* Color-coded tooltip borders */
+#sanity-row[data-tooltip]::after { border-left: 3px solid #b0bec5; }
+#sanity-row[data-tooltip="deranged"]::after,
+#sanity-row[data-tooltip="unhinged from reality"]::after { border-color: #c22b2b; }
+
+#awareness-row[data-tooltip]::after { border-left: 3px solid #9fa8da; }
+#awareness-row[data-tooltip="awakened"]::after { border-color: #f4d03f; }
+
+/* ============================================
+   4. UTILITY CONTROLS
+   ============================================ */
+#utility-controls { 
+  display: flex; 
+  gap: 8px; 
+}
+
+#utility-controls button {
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
+  padding: 5px 10px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Lora", serif;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+#utility-controls button:hover { 
+  border-color: #fff; 
+  color: #fff; 
+}
+
+/* ============================================
+   5. CHOICE BUTTONS
+   ============================================ */
+.choice {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  margin: 10px 0;
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: "Lora", serif;
+}
+
+.choice:hover { 
+  border-color: #fff; 
+  background: #111; 
+}
+
+.choice.already-visited { 
+  opacity: 0.35; 
+  border-color: #222; 
+  color: #888; 
+}
+
+.choice.already-visited:hover { 
+  border-color: #444;
+  background: #111;
+}
+
+/* ============================================
+   6. NAVIGATION BUTTONS
+   ============================================ */
+#next-btn {
+  display: inline-block;
+  padding: 10px 30px;
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+#next-btn:hover { 
+  background: #fff; 
+  color: #000; 
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+#profiles-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+#profiles-wrapper::-webkit-scrollbar-track {
+  background: #111; /* Matches your bg */
+  border-radius: 4px;
+}
+
+#profiles-wrapper::-webkit-scrollbar-thumb {
+  background: #111; /* Slightly lighter */
+  border-radius: 4px;
+}
+
+#profiles-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #000;
+}
+
+/* Firefox */
+#profiles-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #111 #111;
+}
+
+/* ============================================
+   7. ALERTS & INFO BOXES
+   ============================================ */
+.item-alert { 
+  color: #d97706; 
+  font-size: 13px; 
+  margin-top: 15px; 
+}
+
+.stat-alert { 
+  color: #a4b5d6; 
+  font-size: 13px; 
+  margin-top: 8px; 
+}
+
+.info-box { 
+  font-size: 11px; 
+  color: #444; 
+  padding: 15px 20px; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+  border: 1px dashed #222; 
+  text-align: center; 
+  margin: 10px 0; 
+}
+
+/* ============================================
+   8. IPHONE LOCKSCREEN
+   ============================================ */
+.iphone-lockscreen {
+  background: linear-gradient(180deg, #181a24 0%, #07080d 100%);
+  border: 1px solid #222;
+  border-radius: 36px;
+  padding: 20px 15px;
+  height: 600px;
+  width: 276px;
+  margin: 25px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Lockscreen Header */
+.phone-top-status-bar { 
+  width: 100%; 
+  display: flex; 
+  justify-content: space-between; 
+  font-size: 11px; 
+  margin-bottom: 15px; 
+  padding: 0 5px; 
+}
+
+.lock-status-glyph { 
+  font-size: 16px; 
+  margin-bottom: 6px; 
+  opacity: 0.9; 
+}
+
+.lock-date-line { 
+  font-size: 14px; 
+  font-weight: 500; 
+  margin-bottom: 2px; 
+  color: #fff;
+}
+
+.lock-time-display { 
+  font-size: 58px; 
+  font-weight: 200; 
+  line-height: 1; 
+  letter-spacing: -1px; 
+  margin-bottom: 10px; 
+}
+
+/* Lockscreen Widgets */
+.lock-widgets-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+.lock-widget {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 10px 12px;
+  height: 64px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Weather Widget */
+.weather-widget {
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.weather-top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.weather-condition {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 1px;
+}
+
+.weather-range {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* Calendar Widget */
+.calendar-widget {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.calendar-accent {
+  width: 3px;
+  height: 80%;
+  background-color: #fff;
+  border-radius: 2px;
+}
+
+.calendar-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+}
+
+.calendar-time {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.calendar-title {
+  font-size: 12px;
+  font-weight: 400;
+  color: #fff;
+}
+
+.lock-widget-pill-box { 
+  background: rgba(255,255,255,0.07); 
+  border-radius: 8px; 
+  padding: 4px 10px; 
+  font-size: 10px; 
+  color: #ccc; 
+}
+
+/* Lockscreen Notifications */
+.phone-notif-container { 
+  width: 100%; 
+  margin: 0; 
+}
+
+.phone-notif-bubble {
+  background: rgba(25,25,25,0.75);
+  backdrop-filter: blur(20px);
+  border-radius: 13px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.notif-header { 
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 3px; 
+  font-size: 10px; 
+  color: #aaa; 
+  text-transform: uppercase; 
+}
+
+.notif-sender { 
+  color: #fff; 
+  font-size: 13px; 
+  font-weight: 600; 
+  margin-bottom: 2px; 
+}
+
+.notif-message { 
+  color: #ddd; 
+  font-size: 13px; 
+  line-height: 1.3; 
+}
+
+/* Lockscreen Footer */
+.phone-bottom-utilities-grid { 
+  margin-top: auto; 
+  padding-bottom: 10px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 20px; 
+  width: 100%; 
+}
+
+.swipe-to-unlock-text { 
+  font-size: 11px; 
+  color: rgba(255,255,255,0.45); 
+}
+
+.quick-action-row { 
+  width: 100%; 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 0 10px; 
+}
+
+.quick-action-circle { 
+  width: 38px; 
+  height: 38px; 
+  background: rgba(255,255,255,0.1); 
+  backdrop-filter: blur(10px); 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 14px; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+}
+
+/* ============================================
+   9. BROWSER ELEMENTS
+   ============================================ */
+.browser-address-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  background: transparent;
+}
+
+.browser-search-bar {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 6px 12px;
+  width: 280px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   10. ANIMATIONS
+   ============================================ */
+/* Text Shake Animations */
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes dynamic-shake {
+  0% { transform: translate(0.5px, 0.5px); }
+  20% { transform: translate(-0.5px, 0px); }
+  40% { transform: translate(0px, -0.5px); }
+  60% { transform: translate(0.5px, -0.5px); }
+  80% { transform: translate(-0.5px, 0.5px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+@keyframes text-tremble {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(0.3px, -0.3px) rotate(0.1deg); }
+  50% { transform: translate(-0.3px, 0.3px) rotate(-0.1deg); }
+  75% { transform: translate(0.3px, 0.3px) rotate(0.1deg); }
+}
+
+.shake-text {
+  display: inline-block;
+  animation: text-tremble 0.3s infinite ease-in-out;
+}
+
+.shake-warning {
+  display: inline-block;
+  animation: dynamic-shake 0.3s infinite ease-in-out;
+  color: #ffffff; 
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 
+    -1px -1px 0 #000000,
+     1px -1px 0 #000000, 
+    -1px  1px 0 #000000, 
+     1px  1px 0 #000000, 
+     0    0   4px #ff1100,
+     0    0   8px #ff1100,
+     0    0  16px rgba(255, 17, 0, 0.8),
+     0    0  24px rgba(255, 17, 0, 0.4);
+}
+
+/* Typing Animation */
+.typing-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #202124;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0; 
+  border-right: 2px solid #202124; 
+  animation: 
+    type-effect 2.5s steps(15) 0.5s forwards,
+    blink-cursor 0.75s step-end infinite;
+}
+
+@keyframes type-effect {
+  from { width: 0; }
+  to { width: 9.2em; } 
+}
+
+@keyframes blink-cursor {
+  from, to { border-color: transparent; }
+  50% { border-color: #202124; }
+}
+
+/* Pop Animations */
+@keyframes popVanish {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================
+   11. OVERLAYS & MODALS
+   ============================================ */
+.global-overlay {
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  width: 100vw; 
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+}
+
+.overlay-content { 
+  background: #111; 
+  padding: 20px; 
+  border-radius: 8px; 
+  border: 1px solid #222; 
+  max-width: 500px; 
+  width: 100%; 
+}
+
+.overlay-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border-bottom: 1px solid #222; 
+  padding-bottom: 8px; 
+  margin-bottom: 15px; 
+}
+
+.overlay-title { 
+  font-size: 12px; 
+  font-weight: bold; 
+  color: #888; 
+  letter-spacing: 1px; 
+  text-transform: uppercase; 
+}
+
+.close-btn { 
+  background: transparent; 
+  border: none; 
+  color: #555; 
+  cursor: pointer; 
+  font-size: 18px; 
+  line-height: 1; 
+}
+
+/* ============================================
+   12. TOAST NOTIFICATIONS
+   ============================================ */
+#toast-container {
+  position: fixed;
+  top: 55px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999999;
+  pointer-events: none;
+}
+
+#toast-left-container {
+  position: fixed;
+  left: 24px;
+  top: 70px;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 280px;
+  width: 280px; /* Fixed width */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+  pointer-events: none; /* clicks pass through empty space */
+}
+
+#toast-left-container > div {
+  pointer-events: auto; /* re-enable clicks on the toasts themselves */
+}
+
+.toast {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-left: 3px solid #9fa8da;
+  padding: 12px 20px;
+  color: #fff;
+  font-size: 12px;
+  max-width: 280px;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.toast.show { 
+  transform: translateX(0); 
+}
+
+.toast.info { 
+  border-left-color: #9fa8da; 
+}
+
+.toast.warning { 
+  border-left-color: #d97706; 
+}
+
+.toast.danger { 
+  border-left-color: #ef4444; 
+}
+
+/* ============================================
+   13. PROFILE CARDS
+   ============================================ */
+.profile-card {
+  background: #0a0a0a;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 12px;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.profile-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.profile-title {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-section {
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #111;
+  border-radius: 4px;
+  border-left: 2px solid #333;
+}
+
+.profile-section-title {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.profile-section-content {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+.profile-locked {
+  color: #444;
+  font-style: italic;
+}
+
+/* ============================================
+   14. RESET FOR UI COMPONENTS
+   ============================================ */
+.iphone-lockscreen,
+.browser-address-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-align: left;
+}
+}
