@@ -1,7 +1,7 @@
 import { state, saveGame } from './state.js';
 import { updateStats, checkThresholds } from './stats.js';
 import { giveItem } from './inventory.js';
-import { SCENES } from '../../scenes/_index.js';
+import { SCENES } from '../../scenes/index.js';
 import { renderIphoneLockscreen, renderEmailContent } from './renderUtils.js';
 import { discoverPerson } from './profiles.js';
 import { updateDebugStateMonitor } from './debug.js';
