@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Field Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dottie: #ff6b9d;
+            --mikhail: #909090;
+            --remy: #7781e6;
+            --ingram: #b2d669;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #1a1a1f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'VT323', monospace;
+            padding: 20px;
+        }
+
+        .game-window {
+            width: 1000px;
+            height: 600px;
+            background: #f0f0f0;
+            border: 4px solid #333;
+            box-shadow: 0 0 0 4px #1a1a1f, 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* TITLE SCREEN */
+        .title-screen {
+            position: absolute;
+            inset: 0;
+            background: #2a2a3a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .title-logo {
+            font-size: 64px;
+            color: #fff;
+            text-shadow: 4px 4px 0 #000;
+            letter-spacing: 6px;
+        }
+
+        .title-sub {
+            color: #888;
+            font-size: 14px;
+            letter-spacing: 3px;
+        }
+
+        .start-btn {
+            margin-top: 30px;
+            padding: 12px 32px;
+            background: #fff;
+            border: 4px solid #333;
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 #333;
+        }
+
+        .start-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #333;
+        }
+
+        /* CHARACTER SELECT */
+        .char-select {
+            position: absolute;
+            inset: 0;
+            background: #2a2a3a;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .select-header {
+            text-align: center;
+            color: #fff;
+            padding: 10px 0 20px;
+            flex-shrink: 0;
+        }
+
+        .select-header h2 {
+            font-size: 28px;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 5px;
+        }
+
+        .select-header p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .char-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .char-card {
+            background: #1a1a1f;
+            border: 3px solid;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            min-height: 0;
+        }
+
+        .char-card.dottie { border-color: var(--dottie); }
+        .char-card.mikhail { border-color: var(--mikhail); }
+        .char-card.remy { border-color: var(--remy); }
+        .char-card.ingram { border-color: var(--ingram); }
+
+        .char-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+        }
+
+        .card-portrait {
+            height: 80px;
+            background: #2a2a3a;
+            border: 2px solid #444;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            flex-shrink: 0;
+        }
+
+        .card-name {
+            font-size: 22px;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        .dottie .card-name { color: var(--dottie); }
+        .mikhail .card-name { color: var(--mikhail); }
+        .remy .card-name { color: var(--remy); }
+        .ingram .card-name { color: var(--ingram); }
+
+        .card-tagline {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
+
+        .card-hover {
+            position: absolute;
+            inset: 0;
+            background: rgba(10,10,15,0.98);
+            padding: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            color: #ccc;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .char-card:hover .card-hover {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hover-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .hover-desc {
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .hover-stats {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .hover-stat {
+            padding: 3px 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .hover-note {
+            font-style: italic;
+            opacity: 0.7;
+            border-left: 2px solid;
+            padding-left: 8px;
+            margin-top: auto;
+            font-size: 12px;
+        }
+
+        .dottie .hover-note { border-color: var(--dottie); }
+        .mikhail .hover-note { border-color: var(--mikhail); }
+        .remy .hover-note { border-color: var(--remy); }
+        .ingram .hover-note { border-color: var(--ingram); }
+
+        /* MAIN GAME */
+        .game-ui {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            background: #f0f0f0;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 55px;
+            background: #e0e0e0;
+            border-bottom: 3px solid #333;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .phase-box {
+            width: 90px;
+            flex-shrink: 0;
+        }
+
+        .phase-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .phase-time {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .party-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .party-member {
+            width: 42px;
+            height: 42px;
+            border: 3px solid;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: #fff;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .party-member.active {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 0 #333;
+        }
+
+        .party-member.locked {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+        }
+
+        .party-member.inactive {
+            opacity: 0.6;
+        }
+
+        .party-member.dottie { border-color: var(--dottie); }
+        .party-member.mikhail { border-color: var(--mikhail); }
+        .party-member.remy { border-color: var(--remy); }
+        .party-member.ingram { border-color: var(--ingram); }
+
+        .member-status {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-ok { background: #7ed321; }
+        .status-mid { background: #f5a623; }
+        .status-bad { background: #d0021b; }
+
+        .ap-box {
+            width: 70px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .ap-num {
+            font-size: 24px;
+        }
+
+        .ap-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Main Area */
+        .main-area {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+        }
+
+        /* Character Panel */
+        .char-panel {
+            width: 180px;
+            background: #e8e8e8;
+            border-right: 3px solid #333;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .big-portrait {
+            width: 100%;
+            height: 140px;
+            background: #fff;
+            border: 4px solid;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 72px;
+            flex-shrink: 0;
+        }
+
+        .dottie-theme .big-portrait { border-color: var(--dottie); }
+        .mikhail-theme .big-portrait { border-color: var(--mikhail); }
+        .remy-theme .big-portrait { border-color: var(--remy); }
+        .ingram-theme .big-portrait { border-color: var(--ingram); }
+
+        .char-title {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .char-title h3 {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .char-title p {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .mood-text {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            font-style: italic;
+            line-height: 1.3;
+            flex-shrink: 0;
+        }
+
+        .needs-block {
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .need-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .need-emoji {
+            width: 20px;
+            text-align: center;
+        }
+
+        .need-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+
+        .need-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .bar-low { background: #d0021b; }
+        .bar-mid { background: #f5a623; }
+        .bar-high { background: #7ed321; }
+
+        .special-stats {
+            flex-shrink: 0;
+        }
+
+        .special-row {
+            margin-bottom: 8px;
+        }
+
+        .special-label {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .special-bar {
+            height: 6px;
+            background: #ccc;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .special-fill {
+            height: 100%;
+        }
+
+        .dottie-theme .special-fill { background: var(--dottie); }
+        .mikhail-theme .special-fill { background: var(--mikhail); }
+        .remy-theme .special-fill { background: var(--remy); }
+        .ingram-theme .special-fill { background: var(--ingram); }
+
+        /* Center Content */
+        .center-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .scene-box {
+            flex: 1;
+            background: #fff;
+            border-bottom: 3px solid #333;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .location-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #333;
+            color: #fff;
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 3px;
+            z-index: 2;
+        }
+
+        .scene-visual {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            opacity: 0.3;
+            min-height: 0;
+        }
+
+        .scene-text {
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #333;
+            max-height: 100px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .story-log {
+            height: 120px;
+            background: #f5f5f5;
+            padding: 12px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.4;
+            flex-shrink: 0;
+        }
+
+        .story-entry {
+            margin-bottom: 6px;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .story-entry::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #999;
+        }
+
+        .story-entry.time {
+            color: #666;
+            font-size: 11px;
+            margin-top: 8px;
+            border-top: 1px solid #ddd;
+            padding-top: 6px;
+        }
+
+        /* Action Panel */
+        .action-panel {
+            height: 180px;
+            background: #e0e0e0;
+            border-top: 3px solid #333;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .money-display {
+            font-weight: bold;
+        }
+
+        .action-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .action-btn {
+            background: #fff;
+            border: 3px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+            padding: 4px;
+            min-height: 60px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 #333;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .action-btn.used::after {
+            content: '✓';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 10px;
+            color: #7ed321;
+        }
+
+        .btn-emoji {
+            font-size: 16px;
+        }
+
+        .btn-name {
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .btn-cost {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .advance-bar {
+            margin-top: 8px;
+            display: flex;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .next-phase-btn {
+            padding: 8px 24px;
+            background: #333;
+            color: #fff;
+            border: none;
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0.3;
+        }
+
+        .next-phase-btn.active {
+            opacity: 1;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        /* Fade Transition Overlay */
+        .fade-overlay {
+            position: absolute;
+            inset: 0;
+            background: #2a2a3a;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+
+        .fade-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .fade-title {
+            font-size: 36px;
+            color: #fff;
+            text-shadow: 3px 3px 0 #000;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .fade-stories {
+            max-width: 600px;
+            text-align: center;
+            font-size: 16px;
+            color: #ccc;
+            line-height: 1.8;
+        }
+
+        .fade-stories div {
+            margin-bottom: 10px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ddd;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-window">
+        <!-- Title Screen -->
+        <div class="title-screen" id="titleScreen">
+            <div class="title-logo">FIELD GUIDE</div>
+            <div class="title-sub">a game about four people</div>
+            <button class="start-btn" onclick="showCharSelect()">START</button>
+        </div>
+
+        <!-- Character Select -->
+        <div class="char-select" id="charSelect">
+            <div class="select-header">
+                <h2>Choose someone to check on</h2>
+                <p>They all need something. Who first?</p>
+            </div>
+            <div class="char-grid">
+                <div class="char-card dottie" onclick="startGame('dottie')">
+                    <div class="card-portrait">💗</div>
+                    <div class="card-name">DOTTIE</div>
+                    <div class="card-tagline">23 • runs on chaos and instant ramen</div>
+                    <div class="card-hover">
+                        <div class="hover-title" style="color: var(--dottie)">Dottie Sissyk</div>
+                        <div class="hover-desc">Nonbinary, 23, they/them. Student. Currently either texting too much or not at all.</div>
+                        <div class="hover-stats">
+                            <span class="hover-stat">Chaos: High</span>
+                            <span class="hover-stat">Brattiness: High</span>
+                        </div>
+                        <div class="hover-note">"If they're quiet, check your wallet."</div>
+                    </div>
+                </div>
+
+                <div class="char-card mikhail" onclick="startGame('mikhail')">
+                    <div class="card-portrait">🛡️</div>
+                    <div class="card-name">MIKHAIL</div>
+                    <div class="card-tagline">42 • needs schedules like oxygen</div>
+                    <div class="card-hover">
+                        <div class="hover-title" style="color: var(--mikhail)">Mikhail Solntsev</div>
+                        <div class="hover-desc">Cis man, 42, he/him. Former surgeon, now cybersecurity. Hasn't deviated from routine since 2019.</div>
+                        <div class="hover-stats">
+                            <span class="hover-stat">Control: Extreme</span>
+                            <span class="hover-stat">Guilt: Constant</span>
+                        </div>
+                        <div class="hover-note">"He will break before admitting he's tired."</div>
+                    </div>
+                </div>
+
+                <div class="char-card remy" onclick="startGame('remy')">
+                    <div class="card-portrait">🍷</div>
+                    <div class="card-name">RÉMY</div>
+                    <div class="card-tagline">31 • charming until he's not</div>
+                    <div class="card-hover">
+                        <div class="hover-title" style="color: var(--remy)">Rémy Lavergne</div>
+                        <div class="hover-desc">Cis man, 31, he/him. Anaesthesiologist. Currently bored. Dangerous when bored.</div>
+                        <div class="hover-stats">
+                            <span class="hover-stat">Charm: Weaponized</span>
+                            <span class="hover-stat">Cruelty: Casual</span>
+                        </div>
+                        <div class="hover-note">"'Nice' is just a performance he puts on."</div>
+                    </div>
+                </div>
+
+                <div class="char-card ingram" onclick="startGame('ingram')">
+                    <div class="card-portrait">📚</div>
+                    <div class="card-name">INGRAM</div>
+                    <div class="card-tagline">27 • fraying at the edges</div>
+                    <div class="card-hover">
+                        <div class="hover-title" style="color: var(--ingram)">Ingram Svalander</div>
+                        <div class="hover-desc">Male-adjacent, 27, he/they. Student. Taking his meds (today). Apologizing for existing.</div>
+                        <div class="hover-stats">
+                            <span class="hover-stat">Sanity: Tenuous</span>
+                            <span class="hover-stat">Submission: Learned</span>
+                        </div>
+                        <div class="hover-note">"He will say sorry for saying sorry."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fade Transition Overlay -->
+        <div class="fade-overlay" id="fadeOverlay">
+            <div class="fade-title" id="fadeTitle">Morning → Afternoon</div>
+            <div class="fade-stories" id="fadeStories"></div>
+        </div>
+
+        <!-- Main Game UI -->
+        <div class="game-ui" id="gameUI">
+            <div class="top-bar">
+                <div class="phase-box">
+                    <div class="phase-name" id="phaseName">Morning</div>
+                    <div class="phase-time" id="phaseTime">08:00-12:00</div>
+                </div>
+                <div class="party-bar">
+                    <div class="party-member dottie" id="pm-dottie" onclick="switchChar('dottie')">
+                        <span>💗</span>
+                        <div class="member-status status-ok" id="status-dottie">✓</div>
+                    </div>
+                    <div class="party-member mikhail" id="pm-mikhail" onclick="switchChar('mikhail')">
+                        <span>🛡️</span>
+                        <div class="member-status status-ok" id="status-mikhail">✓</div>
+                    </div>
+                    <div class="party-member remy" id="pm-remy" onclick="switchChar('remy')">
+                        <span>🍷</span>
+                        <div class="member-status status-mid" id="status-remy">!</div>
+                    </div>
+                    <div class="party-member ingram" id="pm-ingram" onclick="switchChar('ingram')">
+                        <span>📚</span>
+                        <div class="member-status status-ok" id="status-ingram">✓</div>
+                    </div>
+                </div>
+                <div class="ap-box">
+                    <div class="ap-num"><span id="apCurrent">4</span>/4</div>
+                    <div class="ap-label">hours</div>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="char-panel dottie-theme" id="charPanel">
+                    <div class="big-portrait" id="bigPortrait">💗</div>
+                    <div class="char-title">
+                        <h3 id="charName">Dottie</h3>
+                        <p id="charSub">they/them • 23</p>
+                    </div>
+                    <div class="mood-text" id="moodText">bored and looking for trouble</div>
+                    <div class="needs-block">
+                        <div class="need-row">
+                            <span class="need-emoji">🍕</span>
+                            <div class="need-bar-bg">
+                                <div class="need-bar-fill bar-mid" id="hungerBar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="need-row">
+                            <span class="need-emoji">💬</span>
+                            <div class="need-bar-bg">
+                                <div class="need-bar-fill bar-low" id="attentionBar" style="width: 35%"></div>
+                            </div>
+                        </div>
+                        <div class="need-row">
+                            <span class="need-emoji">⚡</span>
+                            <div class="need-bar-bg">
+                                <div class="need-bar-fill bar-mid" id="energyBar" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="special-stats">
+                        <div class="special-row">
+                            <div class="special-label" id="special1Label">Chaos</div>
+                            <div class="special-bar">
+                                <div class="special-fill" id="special1Bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="special-row">
+                            <div class="special-label" id="special2Label">Brattiness</div>
+                            <div class="special-bar">
+                                <div class="special-fill" id="special2Bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-content">
+                    <div class="scene-box">
+                        <div class="location-tag" id="locationTag">Dottie's Bedroom</div>
+                        <div class="scene-visual" id="sceneVisual">🛏️</div>
+                        <div class="scene-text" id="sceneText">Dottie is lying on their bed, scrolling through their phone. They look up with an expression that says they're about to ask for something.</div>
+                    </div>
+                    <div class="story-log" id="storyLog">
+                        <div class="story-entry time">Morning begins...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-panel">
+                <div class="action-header">
+                    <span>ACTIONS</span>
+                    <span class="money-display" id="moneyDisplay">$23</span>
+                </div>
+                <div class="action-grid" id="actionGrid"></div>
+                <div class="advance-bar">
+                    <button class="next-phase-btn" id="nextBtn" onclick="nextPhase()" disabled>Next Phase →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            current: 'dottie',
+            phase: 0,
+            day: 1,
+            ap: 4,
+            actionTaken: false,
+            chars: {
+                dottie: {
+                    name: 'Dottie', sub: 'they/them • 23',
+                    money: 23,
+                    dailyIncome: { min: 15, max: 25, source: 'allowance' },
+                    workPhases: [],
+                    pronoun: 'they', possessive: 'their', reflexive: 'themself',
+                    emoji: '💗', theme: 'dottie-theme',
+                    location: "Dottie's Bedroom", sceneEmoji: '🛏️',
+                    special1: 'Chaos', special2: 'Brattiness',
+                    hunger: 60, attention: 35, energy: 50,
+                    chaos: 75, brattiness: 60,
+                    status: 'ok',
+                    actions: {
+                        default: [
+                            { emoji: '📱', name: 'Text Mikhail', cost: 1, used: false },
+                            { emoji: '🍜', name: 'Eat Ramen', cost: 1, used: false },
+                            { emoji: '🚬', name: 'Smoke', cost: 1, used: false },
+                            { emoji: '🤳', name: 'Take Selfies', cost: 1, used: false },
+                            { emoji: '🛍️', name: 'Online Shop', cost: 2, used: false, unique: true },
+                            { emoji: '💥', name: 'Start Drama', cost: 2, used: false, unique: true },
+                            { emoji: '👁️', name: 'Stare at Wall', cost: 0, used: false },
+                            { emoji: '💊', name: 'Take Meds', cost: 1, used: false }
+                        ],
+                        work: null
+                    },
+                    randomEvents: [
+                        'Dottie is buying something they do not need.',
+                        'Dottie has started three group chats in the last hour.',
+                        'Dottie is considering dyeing their hair. Again.',
+                        'Dottie found $5 in a jacket they stole from Mikhail.',
+                        'Dottie is having an existential crisis. It is Tuesday.'
+                    ],
+                    lines: {
+                        idle: 'is lying on their bed, scrolling through their phone.',
+                        hungry: 'is digging through their bag for stray candy.',
+                        needy: 'has sent 12 texts in the last hour.',
+                        chaotic: 'is grinning. They have an idea. It is a bad idea.'
+                    }
+                },
+                mikhail: {
+                    name: 'Mikhail', sub: 'he/him • 42',
+                    money: 340,
+                    dailyIncome: { min: 120, max: 180, source: 'consulting' },
+                    workPhases: [0, 1],
+                    pronoun: 'he', possessive: 'his', reflexive: 'himself',
+                    emoji: '🛡️', theme: 'mikhail-theme',
+                    location: "Mikhail's Apartment", sceneEmoji: '🏢',
+                    special1: 'Control', special2: 'Guilt',
+                    hunger: 80, attention: 20, energy: 70,
+                    control: 90, guilt: 45,
+                    status: 'ok',
+                    actions: {
+                        default: [
+                            { emoji: '📋', name: 'Check Schedule', cost: 1, used: false },
+                            { emoji: '🏋️', name: 'Go to Gym', cost: 2, used: false, unique: true },
+                            { emoji: '🍗', name: 'Eat Protein', cost: 1, used: false },
+                            { emoji: '🧘', name: 'Meditate', cost: 1, used: false },
+                            { emoji: '☕', name: 'Make Coffee', cost: 1, used: false },
+                            { emoji: '🛏️', name: 'Stand Still', cost: 0, used: false },
+                            { emoji: '📱', name: 'Check Messages', cost: 1, used: false },
+                            { emoji: '🚬', name: 'Smoke Break', cost: 1, used: false }
+                        ],
+                        work: [
+                            { emoji: '🔒', name: 'Security Audit', cost: 2, used: false },
+                            { emoji: '📊', name: 'Review Logs', cost: 1, used: false },
+                            { emoji: '☕', name: 'Office Coffee', cost: 1, used: false },
+                            { emoji: '📧', name: 'Answer Emails', cost: 1, used: false },
+                            { emoji: '🏢', name: 'Meeting', cost: 2, used: false },
+                            { emoji: '🔐', name: 'Penetration Test', cost: 2, used: false },
+                            { emoji: '📋', name: 'Compliance Check', cost: 1, used: false },
+                            { emoji: '🚬', name: 'Smoke Break', cost: 1, used: false }
+                        ]
+                    },
+                    randomEvents: [
+                        'Mikhail is staring at a spreadsheet. He has not blinked in 3 minutes.',
+                        'Mikhail just corrected someones grammar in a work email.',
+                        'Mikhail is organizing his desk drawers. By size. By color. By weight.',
+                        'Mikhail received a text from Dottie. He marked it as unread.',
+                        'Mikhail is considering calling his sister. He will not.'
+                    ],
+                    lines: {
+                        idle: 'is standing at his kitchen counter, exactly where he stands every morning.',
+                        guilty: 'is staring at his phone. He should call his sister. He will not.',
+                        rigid: 'has noticed a coaster is 2mm out of place.'
+                    }
+                },
+                remy: {
+                    name: 'Rémy', sub: 'he/him • 31',
+                    money: 520,
+                    dailyIncome: { min: 200, max: 300, source: 'hospital' },
+                    workPhases: [1, 2],
+                    pronoun: 'he', possessive: 'his', reflexive: 'himself',
+                    emoji: '🍷', theme: 'remy-theme',
+                    location: "Rémy's Condo", sceneEmoji: '🏙️',
+                    special1: 'Charm', special2: 'Cruelty',
+                    hunger: 50, attention: 80, energy: 60,
+                    charm: 70, cruelty: 55,
+                    status: 'mid',
+                    actions: {
+                        default: [
+                            { emoji: '🍷', name: 'Pour Wine', cost: 1, used: false },
+                            { emoji: '📱', name: 'Text Ingram', cost: 1, used: false },
+                            { emoji: '🎯', name: 'Push Boundaries', cost: 1, used: false },
+                            { emoji: '🍽️', name: 'Fine Dining', cost: 2, used: false },
+                            { emoji: '👔', name: 'Check Mirror', cost: 1, used: false },
+                            { emoji: '😏', name: 'Smirk', cost: 0, used: false },
+                            { emoji: '📺', name: 'Watch TV', cost: 1, used: false },
+                            { emoji: '🛁', name: 'Long Bath', cost: 2, used: false }
+                        ],
+                        work: [
+                            { emoji: '🔪', name: 'Surgery', cost: 3, used: false },
+                            { emoji: '💉', name: 'Patient Prep', cost: 2, used: false },
+                            { emoji: '📋', name: 'Chart Review', cost: 1, used: false },
+                            { emoji: '☕', name: 'Surgeon Lounge', cost: 1, used: false },
+                            { emoji: '🩺', name: 'Rounds', cost: 2, used: false },
+                            { emoji: '📞', name: 'Consult', cost: 1, used: false },
+                            { emoji: '🧤', name: 'Scrub In', cost: 2, used: false },
+                            { emoji: '🍷', name: 'Steal Wine', cost: 1, used: false }
+                        ]
+                    },
+                    randomEvents: [
+                        'Rémy just made a nurse cry. He smiled while doing it.',
+                        'Rémy is reviewing patient files. He is bored.',
+                        'Rémy found the good stuff in the anesthesia locker.',
+                        'Rémy is charming a patients family. They love him.',
+                        'Rémy is considering texting Ingram. Cruelly.'
+                    ],
+                    lines: {
+                        idle: 'is swirling wine in a glass that cost more than most peoples rent.',
+                        charming: 'is practicing smiles in the mirror. He has three versions.',
+                        cruel: 'just said something cutting. He is waiting to see if you noticed.'
+                    }
+                },
+                ingram: {
+                    name: 'Ingram', sub: 'he/they • 27',
+                    money: 12,
+                    dailyIncome: { min: 10, max: 20, source: 'stipend' },
+                    workPhases: [],
+                    pronoun: 'they', possessive: 'their', reflexive: 'themself',
+                    emoji: '📚', theme: 'ingram-theme',
+                    location: "Ingram's Corner", sceneEmoji: '📖',
+                    special1: 'Sanity', special2: 'Submission',
+                    hunger: 40, attention: 30, energy: 25,
+                    sanity: 60, submission: 75,
+                    status: 'ok',
+                    actions: {
+                        default: [
+                            { emoji: '💊', name: 'Take Meds', cost: 1, used: false, unique: true },
+                            { emoji: '📖', name: 'Study', cost: 2, used: false },
+                            { emoji: '🐟', name: 'Eat Fish', cost: 1, used: false },
+                            { emoji: '📱', name: 'Text Rémy', cost: 1, used: false },
+                            { emoji: '📚', name: 'Read Book', cost: 1, used: false },
+                            { emoji: '🙇', name: 'Apologize', cost: 0, used: false },
+                            { emoji: '📝', name: 'Take Notes', cost: 1, used: false },
+                            { emoji: '🪟', name: 'Look Outside', cost: 1, used: false }
+                        ],
+                        work: null
+                    },
+                    randomEvents: [
+                        'Ingram is reading the same paragraph for the 10th time.',
+                        'Ingram just apologized to a bookshelf.',
+                        'Ingram is counting their medication. Again.',
+                        'Ingram saw Rémy today. They cannot stop thinking about it.',
+                        'Ingram is writing an email to their professor. Draft 7.'
+                    ],
+                    lines: {
+                        idle: 'is curled in their corner, surrounded by books.',
+                        fragile: 'is counting their pills. They are sure they took them.',
+                        waiting: 'is staring at their phone. Rémy has not texted back.'
+                    }
+                }
+            }
+        };
+
+        const phases = [
+            { name: 'Morning', time: '08:00-12:00' },
+            { name: 'Afternoon', time: '12:00-16:00' },
+            { name: 'Evening', time: '16:00-20:00' },
+            { name: 'Night', time: '20:00-00:00' }
+        ];
+
+        function showCharSelect() {
+            document.getElementById('titleScreen').style.display = 'none';
+            document.getElementById('charSelect').style.display = 'flex';
+        }
+
+        function startGame(char) {
+            game.current = char;
+            document.getElementById('charSelect').style.display = 'none';
+            document.getElementById('gameUI').style.display = 'flex';
+            initUI();
+        }
+
+        function initUI() {
+            updateUI();
+            renderActions();
+            updatePartyBar();
+            addStory(`You check in on ${game.chars[game.current].name}.`);
+        }
+
+        function isCharAvailable(charId) {
+            const c = game.chars[charId];
+            if (charId === game.current) return true;
+            if (c.workPhases.includes(game.phase)) return false;
+            return true;
+        }
+
+        function isAtWork(charId) {
+            const c = game.chars[charId];
+            return c.workPhases.includes(game.phase);
+        }
+
+        function updateUI() {
+            const c = game.chars[game.current];
+            
+            document.getElementById('charPanel').className = `char-panel ${c.theme}`;
+            document.getElementById('bigPortrait').textContent = c.emoji;
+            document.getElementById('charName').textContent = c.name;
+            document.getElementById('charSub').textContent = c.sub;
+            
+            const atWork = isAtWork(game.current);
+            document.getElementById('locationTag').textContent = atWork ? `${c.name} (at work)` : c.location;
+            document.getElementById('sceneVisual').textContent = atWork ? '🏢' : c.sceneEmoji;
+            
+            let mood = c.lines.idle;
+            if (c.hunger < 30) mood = c.lines.hungry || mood;
+            else if (c.attention < 30) mood = c.lines.needy || mood;
+            else if ((c.chaos > 80) || (c.cruelty > 80)) mood = c.lines.chaotic || c.lines.cruel || mood;
+            
+            document.getElementById('sceneText').textContent = `${c.name} ${mood}`;
+            
+            document.getElementById('phaseName').textContent = phases[game.phase].name;
+            document.getElementById('phaseTime').textContent = phases[game.phase].time;
+            document.getElementById('apCurrent').textContent = game.ap;
+            document.getElementById('moneyDisplay').textContent = `$${c.money}`;
+            
+            updateBar('hunger', c.hunger);
+            updateBar('attention', c.attention);
+            updateBar('energy', c.energy);
+            
+            document.getElementById('special1Label').textContent = c.special1;
+            document.getElementById('special2Label').textContent = c.special2;
+            document.getElementById('special1Bar').style.width = (c[c.special1.toLowerCase()] || 50) + '%';
+            document.getElementById('special2Bar').style.width = (c[c.special2.toLowerCase()] || 50) + '%';
+            
+            const btn = document.getElementById('nextBtn');
+            btn.disabled = game.ap > 0;
+            btn.className = game.ap === 0 ? 'next-phase-btn active' : 'next-phase-btn';
+            btn.textContent = game.ap === 0 ? 'Next Phase →' : `${game.ap} hours left`;
+        }
+
+        function updateBar(type, val) {
+            const bar = document.getElementById(type + 'Bar');
+            bar.style.width = val + '%';
+            bar.className = 'need-bar-fill ' + (val < 30 ? 'bar-low' : val < 60 ? 'bar-mid' : 'bar-high');
+        }
+
+        function updatePartyBar() {
+            Object.keys(game.chars).forEach(k => {
+                const pm = document.getElementById(`pm-${k}`);
+                const st = document.getElementById(`status-${k}`);
+                const ch = game.chars[k];
+                const available = isCharAvailable(k);
+                const isCurrent = k === game.current;
+                
+                pm.classList.remove('active', 'inactive', 'locked');
+                
+                if (isCurrent) {
+                    pm.classList.add('active');
+                    pm.style.opacity = '1';
+                    pm.style.cursor = 'default';
+                } else if (!available) {
+                    pm.classList.add('locked');
+                    pm.style.opacity = '0.3';
+                    pm.style.cursor = 'not-allowed';
+                } else if (game.actionTaken) {
+                    pm.classList.add('inactive');
+                    pm.style.opacity = '0.4';
+                    pm.style.cursor = 'not-allowed';
+                } else {
+                    pm.classList.add('inactive');
+                    pm.style.opacity = '0.7';
+                    pm.style.cursor = 'pointer';
+                }
+                
+                let status = 'ok', icon = '✓';
+                if (ch.hunger < 30 || ch.energy < 20) { status = 'bad'; icon = '✗'; }
+                else if (ch.attention < 40 || ch.sanity < 40) { status = 'mid'; icon = '!'; }
+                
+                st.className = `member-status status-${status}`;
+                st.textContent = icon;
+            });
+        }
+
+        function renderActions() {
+            const grid = document.getElementById('actionGrid');
+            const c = game.chars[game.current];
+            const atWork = isAtWork(game.current);
+            const actionList = atWork && c.actions.work ? c.actions.work : c.actions.default;
+            
+            grid.innerHTML = '';
+            
+            actionList.forEach((a, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn' + (a.used ? ' used' : '');
+                btn.innerHTML = `
+                    <span class="btn-emoji">${a.emoji}</span>
+                    <span class="btn-name">${a.name}</span>
+                    <span class="btn-cost">${a.cost}h</span>
+                `;
+                btn.disabled = a.used || game.ap < a.cost;
+                btn.onclick = () => doAction(i, atWork);
+                grid.appendChild(btn);
+            });
+        }
+
+        function doAction(index, isWork) {
+            const c = game.chars[game.current];
+            const actionList = isWork && c.actions.work ? c.actions.work : c.actions.default;
+            const a = actionList[index];
+            
+            if (a.used || game.ap < a.cost) return;
+            
+            game.ap -= a.cost;
+            a.used = true;
+            game.actionTaken = true;
+            
+            if (a.name.includes('Eat')) c.hunger = Math.min(100, c.hunger + 25);
+            if (a.name.includes('Text')) c.attention = Math.min(100, c.attention + 20);
+            if (a.name.includes('Gym') || a.name.includes('Study')) c.energy = Math.max(0, c.energy - 15);
+            if (a.name.includes('Meds')) { c.sanity = Math.min(100, c.sanity + 20); c.energy += 10; }
+            
+            if (a.unique) {
+                if (c.chaos !== undefined) c.chaos += 10;
+                if (c.control !== undefined) c.control += 10;
+                if (c.cruelty !== undefined) c.cruelty += 10;
+                if (c.sanity !== undefined) c.sanity += 15;
+            }
+            
+            if (a.name.includes('Shop')) c.money -= 15;
+            if (a.name.includes('Dining')) c.money -= 30;
+            
+            if (isWork && (a.name.includes('Surgery') || a.name.includes('Audit') || a.name.includes('Test'))) {
+                const pay = Math.floor(Math.random() * 30) + 20;
+                c.money += pay;
+                addStory(`${c.name} earned $${pay} for that.`);
+            }
+            
+            const stories = {
+                'Text Mikhail': `Dottie sends 7 texts in a row. Mikhail reads them. He does not respond.`,
+                'Eat Ramen': `The noodles are instant. The regret is immediate.`,
+                'Smoke': `Five minutes of peace. Worth it.`,
+                'Take Selfies': `47 photos. Zero keepers. Dottie posts one anyway.`,
+                'Online Shop': `Dottie bought something they do not remember adding to cart. $15 gone.`,
+                'Start Drama': `The group chat is on fire. Dottie is thriving.`,
+                'Check Schedule': `Mikhail confirms: everything is on track. He allows himself to breathe.`,
+                'Go to Gym': `5 AM. Exactly on time. The routine holds.`,
+                'Pour Wine': `Rémy swirls the glass. It is too early. He does not care.`,
+                'Text Ingram': `Rémy sends "hey." Ingram will stare at this for twenty minutes.`,
+                'Take Meds': `Ingram counts the pills twice. Then once more. Then takes them.`,
+                'Surgery': `Rémy saves a life. He feels nothing.`,
+                'Security Audit': `Mikhail finds three vulnerabilities. He is satisfied.`
+            };
+            
+            addStory(stories[a.name] || `${c.name} ${a.name.toLowerCase()}.`);
+            
+            if (Math.random() < 0.3) randomEvent();
+            
+            updateUI();
+            renderActions();
+            updatePartyBar();
+        }
+
+        function randomEvent() {
+            const c = game.chars[game.current];
+            const events = c.randomEvents || ['Something happened.'];
+            const text = events[Math.floor(Math.random() * events.length)];
+            addStory(text);
+        }
+
+        function switchChar(char) {
+            if (game.actionTaken) {
+                addStory(`${game.chars[game.current].name} is busy. You cannot switch now.`);
+                return;
+            }
+            if (!isCharAvailable(char)) {
+                const c = game.chars[char];
+                const working = c.workPhases.includes(game.phase);
+                addStory(`${c.name} is at work (${working ? phases[game.phase].name : ''}). You cannot reach them.`);
+                return;
+            }
+            if (char === game.current) return;
+            
+            game.current = char;
+            const newChar = game.chars[char];
+            
+            Object.values(game.chars).forEach(c => {
+                if (c.actions.default) c.actions.default.forEach(a => a.used = false);
+                if (c.actions.work) c.actions.work.forEach(a => a.used = false);
+            });
+            
+            addStory(`You check on ${newChar.name} instead.`);
+            updateUI();
+            renderActions();
+            updatePartyBar();
+        }
+
+        function nextPhase() {
+            if (game.ap > 0) return;
+            
+            const next = (game.phase + 1) % 4;
+            const overlay = document.getElementById('fadeOverlay');
+            const title = document.getElementById('fadeTitle');
+            const stories = document.getElementById('fadeStories');
+            
+            title.textContent = `${phases[game.phase].name} → ${phases[next].name}`;
+            
+            const vigs = [
+                `💗 Dottie ${game.chars.dottie.energy < 30 ? 'crashed' : 'caused problems'}.`,
+                `🛡️ Mikhail ${game.chars.mikhail.guilt > 60 ? 'felt guilty about nothing' : 'maintained control'}.`,
+                `🍷 Rémy ${game.chars.remy.cruelty > 70 ? 'hurt someones feelings' : 'charmed a waiter'}.`,
+                `📚 Ingram ${game.chars.ingram.sanity < 50 ? 'slipped a little' : 'held it together'}.`
+            ];
+            stories.innerHTML = vigs.map(v => `<div>${v}</div>`).join('');
+            
+            overlay.classList.add('active');
+            
+            setTimeout(() => {
+                game.phase = next;
+                
+                if (game.phase === 0) {
+                    game.day++;
+                    Object.values(game.chars).forEach(c => {
+                        if (c.dailyIncome) {
+                            const gain = Math.floor(Math.random() * (c.dailyIncome.max - c.dailyIncome.min)) + c.dailyIncome.min;
+                            c.money += gain;
+                        }
+                    });
+                }
+                
+                game.ap = 4;
+                game.actionTaken = false;
+                
+                Object.values(game.chars).forEach(c => {
+                    if (c.actions.default) c.actions.default.forEach(a => a.used = false);
+                    if (c.actions.work) c.actions.work.forEach(a => a.used = false);
+                });
+                
+                if (!isCharAvailable(game.current)) {
+                    const forcedOut = game.chars[game.current];
+                    const available = Object.keys(game.chars).find(k => isCharAvailable(k));
+                    if (available) {
+                        addStory(`${forcedOut.name} had to leave for work.`);
+                        game.current = available;
+                    }
+                }
+                
+                overlay.classList.remove('active');
+                updateUI();
+                renderActions();
+                updatePartyBar();
+                addStory(`${phases[game.phase].name} begins.`, true);
+            }, 2000);
+        }
+
+        function addStory(text, isTime = false) {
+            const log = document.getElementById('storyLog');
+            const entry = document.createElement('div');
+            entry.className = isTime ? 'story-entry time' : 'story-entry';
+            
+            const hour = 8 + (game.phase * 4) + (4 - game.ap);
+            entry.textContent = isTime ? text : `[${hour.toString().padStart(2, '0')}:00] ${text}`;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+</body>
+</html>
